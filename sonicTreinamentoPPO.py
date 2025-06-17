@@ -191,20 +191,16 @@ def main():
 
     lr_schedule = get_linear_fn(2.5e-4, 1e-5, 1.0)
 
-    modelo = RecurrentPPO(
-        'CnnLstmPolicy',
-        env,
-        learning_rate=lr_schedule, # Taxa de aprendizado
-        n_steps=2048,              # Número de passos por atualização
-        batch_size=64,             # Tamanho do batch
-        n_epochs=10,               # Número de épocas por atualização
-        gamma=0.99,                # Fator de desconto
-        gae_lambda=0.95,           # Parâmetro GAE
-        clip_range=0.2,            # Parâmetro de clipping do PPO
-        ent_coef=0.2,              # Coeficiente de entropia
-        verbose=2,
-        tensorboard_log='./tensorboard/'
-    )
+    modelo = RecurrentPPO.load('./checkpoint_sonic_ppo/sonic_ppo_1725000_steps_Melhor.zip')
+    modelo.batch_size = 256
+    modelo.ent_coef = 0.1
+    modelo.max_grad_norm = 0.5
+    modelo.vf_coef = 0.5
+    modelo.policy_kwargs=dict(
+            lstm_hidden_size=256,
+            share_features_extractor=True
+        )
+    modelo.set_env(env)
 
     modelo.learn(
         total_timesteps=25_000_000,
