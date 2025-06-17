@@ -43,9 +43,6 @@ def criar_ambiente():
 def testa_modelo(caminho_modelo):
     env = criar_ambiente()
 
-    
-
-
     modelo = RecurrentPPO.load(caminho_modelo)
     obs = env.reset()
     lstm_states = None
@@ -57,15 +54,11 @@ def testa_modelo(caminho_modelo):
     while not done:
         action, lstm_states = modelo.predict(obs, state=lstm_states, episode_start=np.array([done]), deterministic = True)
 
-        for _ in range(SKIP):
-            obs, reward, done, info = env.step(action)
-            if done:
-                break
-
+        obs, reward, done, info = env.step(action)
+        
         recompensa_total += reward
 
         frame = env.render(mode='rgb_array')
-
 
 
         frame_bgr = cv2.cvtColor(env.render(mode='rgb_array'), cv2.COLOR_RGB2BGR)
